@@ -1,0 +1,90 @@
+"use strict";
+
+const $ = document.querySelector.bind(document);
+
+const TOLERANCE = new Decimal("0.000000000000001");
+const MAX_ITERATION = 23;
+
+let iteration = -1;
+
+let generateKeyMap = (xi, fx, f1x, keyMap = []) => {
+	let _xi = xi ? xi.minus(fx.dividedBy(f1x)) : new Decimal("5981825.000000000000000");
+	let _fx = _xi.pow(2).minus(_xi.times(18)).add(32);
+	let _f1x = _xi.times(2).minus(18);
+
+	if(++iteration > MAX_ITERATION) return keyMap;
+
+	if(iteration === 0) {
+		return generateKeyMap(_xi, _fx, _f1x, [...keyMap]);
+	} else {
+		if(_fx.greaterThanOrEqualTo(TOLERANCE)) {
+			let keyRow = [];
+			let item = _xi.toFixed(15).replace(".", "").slice(0, 15).split("");
+
+			for(let i = 0; i < 15; i += 3) {
+				let keyStr = "";
+				
+				for(let j = 0; j < 3; ++j) keyStr += item[i + j];
+
+				keyRow.push(keyStr);
+			}
+
+			return generateKeyMap(_xi, _fx, _f1x, [...keyMap, keyRow]);
+		} else return keyMap;
+	}
+};
+
+const KEY_MAP = generateKeyMap();
+
+const ENCRYPT_PLAINTEXT_INPUT = $("#encrypt-plaintext-input");
+const ENCRYPT_KEY_INPUT = $("#encrypt-key-input");
+const ENCRYPT_SUBMIT_BUTTON = $("#encrypt-submit-button");
+const DECRYPT_CIPHERTEXT_INPUT = $("#decrypt-ciphertext-input");
+const DECRYPT_KEY_INPUT = $("#decrypt-key-input");
+const DECRYPT_SUBMIT_BUTTON = $("#decrypt-submit-button");
+const OUTPUT_WRAPPER = $("#output-wrapper");
+
+let toggleOutput = (text, outputWrapper) => {
+	outputWrapper.classList.remove("active");
+	
+	setTimeout(() => {
+		outputWrapper.innerHTML = `<span id="output-text">${text}</span>`;
+		outputWrapper.classList.add("active");
+	}, 500);
+};
+
+let crypto = (type, data) => {
+	let pi, ci, ki, ascii;
+	let output = "";
+
+	for(let i = 0; i < data.text.length; ++i) {
+		switch(type) {
+			case "ENCRYPT":
+				pi = data.text.charCodeAt(i);
+				ki = +KEY_MAP[i % KEY_MAP.length][+data.key - 1] % 256;
+				ascii = (pi + ki) % 256;
+			break;
+			case "DECRYPT":
+				ci = data.text.charCodeAt(i);
+				ki = +KEY_MAP[i % KEY_MAP.length][+data.key - 1] % 256;
+				ascii = ci >= ki ? ((ci - ki) % 256) : ((ci + 256 - ki) % 256);
+			break;
+		}
+
+		output += String.fromCharCode(ascii);
+	}
+
+	toggleOutput(output, OUTPUT_WRAPPER);
+};
+
+ENCRYPT_SUBMIT_BUTTON.addEventListener("click", () => {
+	if(+ENCRYPT_KEY_INPUT.value < 1 || +ENCRYPT_KEY_INPUT.value > 5) return;
+	
+	crypto("ENCRYPT", { text: ENCRYPT_PLAINTEXT_INPUT.value, key: ENCRYPT_KEY_INPUT.value });
+});
+
+DECRYPT_SUBMIT_BUTTON.addEventListener("click", () => {
+	if(+DECRYPT_KEY_INPUT.value < 1 || +DECRYPT_KEY_INPUT.value > 5) return;
+
+	crypto("DECRYPT", { text: DECRYPT_CIPHERTEXT_INPUT.value, key: DECRYPT_KEY_INPUT.value });
+});
