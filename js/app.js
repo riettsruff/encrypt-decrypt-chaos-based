@@ -79,12 +79,10 @@ let crypto = (type, data) => {
 
 ENCRYPT_SUBMIT_BUTTON.addEventListener("click", () => {
 	if(+ENCRYPT_KEY_INPUT.value < 1 || +ENCRYPT_KEY_INPUT.value > 5) return;
-	
 	crypto("ENCRYPT", { text: ENCRYPT_PLAINTEXT_INPUT.value, key: ENCRYPT_KEY_INPUT.value });
 });
 
 DECRYPT_SUBMIT_BUTTON.addEventListener("click", () => {
 	if(+DECRYPT_KEY_INPUT.value < 1 || +DECRYPT_KEY_INPUT.value > 5) return;
-
 	crypto("DECRYPT", { text: DECRYPT_CIPHERTEXT_INPUT.value, key: DECRYPT_KEY_INPUT.value });
 });
