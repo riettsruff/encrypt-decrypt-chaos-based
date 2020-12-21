@@ -15,11 +15,11 @@ let generateKeyMap = (xi, fx, f1x, keyMap = []) => {
 	if(++iteration > MAX_ITERATION) return keyMap;
 
 	if(iteration === 0) {
-		return generateKeyMap(_xi, _fx, _f1x, [...keyMap]);
+		return generateKeyMap(_xi, _fx, _f1x, keyMap);
 	} else {
 		if(_fx.greaterThanOrEqualTo(TOLERANCE)) {
 			let keyRow = [];
-			let item = _xi.toFixed(15).replace(".", "").slice(0, 15).split("");
+			let item = _xi.toPrecision(15).replace(".", "").slice(0, 15).split("");
 
 			for(let i = 0; i < 15; i += 3) {
 				let keyStr = "";
@@ -67,7 +67,7 @@ let crypto = (type, data) => {
 			case "DECRYPT":
 				ci = data.text.charCodeAt(i);
 				ki = +KEY_MAP[i % KEY_MAP.length][+data.key - 1] % 256;
-				ascii = ci >= ki ? ((ci - ki) % 256) : ((ci + 256 - ki) % 256);
+				ascii = ((ci + 256 - ki) % 256);
 			break;
 		}
 
