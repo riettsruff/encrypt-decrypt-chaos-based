@@ -2,35 +2,36 @@
 
 const $ = document.querySelector.bind(document);
 
-const TOLERANCE = new Decimal("0.000000000000001");
-const MAX_ITERATION = 23;
+const MAX_ITERATION = 200;
+const X0 = new Decimal("0.880000000000000");
 
 let iteration = -1;
 
 let generateKeyMap = (xi, fx, f1x, keyMap = []) => {
-	let _xi = xi ? xi.minus(fx.dividedBy(f1x)) : new Decimal("5981825.000000000000000");
-	let _fx = _xi.pow(2).minus(_xi.times(18)).add(32);
-	let _f1x = _xi.times(2).minus(18);
+	let _fx = xi ? xi.pow(2).times(8).minus(xi).add(1) : 0;
+	let _f1x = xi ? xi.times(16).minus(1) : 0;
+	let _xi = xi ? xi.minus(_fx.dividedBy(_f1x)) : X0;
 
 	if(++iteration > MAX_ITERATION) return keyMap;
 
 	if(iteration === 0) {
-		return generateKeyMap(_xi, _fx, _f1x, keyMap);
+		return generateKeyMap(_xi);
 	} else {
-		if(_fx.greaterThanOrEqualTo(TOLERANCE)) {
-			let keyRow = [];
-			let item = _xi.toPrecision(15).replace(".", "").slice(0, 15).split("");
+		let keyRow = [];
+		let indexOfDot = _xi.toString().indexOf(".");
+		let xiFixed15 = _xi.toFixed(15);
 
-			for(let i = 0; i < 15; i += 3) {
-				let keyStr = "";
-				
-				for(let j = 0; j < 3; ++j) keyStr += item[i + j];
+		let item = xiFixed15.substring(indexOfDot + 1, xiFixed15.length).split("");
 
-				keyRow.push(keyStr);
-			}
+		for(let i = 0; i < 15; i += 3) {
+			let keyStr = "";
+			
+			for(let j = 0; j < 3; ++j) keyStr += item[i + j];
 
-			return generateKeyMap(_xi, _fx, _f1x, [...keyMap, keyRow]);
-		} else return keyMap;
+			keyRow.push(keyStr);
+		}
+
+		return generateKeyMap(_xi, _fx, _f1x, [...keyMap, keyRow]);
 	}
 };
 
