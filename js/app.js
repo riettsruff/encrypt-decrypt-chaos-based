@@ -67,7 +67,7 @@ let crypto = (type, data) => {
 			case "DECRYPT":
 				ci = data.text.charCodeAt(i);
 				ki = +KEY_MAP[i % KEY_MAP.length][+data.key - 1] % 256;
-				ascii = (ci + 256 - ki) % 256;
+				ascii = (ci < ki ? (ci + 256 - ki) : (ci - ki)) % 256;
 			break;
 		}
 
