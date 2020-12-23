@@ -57,22 +57,28 @@ let toggleOutput = (text, outputWrapper) => {
 let crypto = (type, data) => {
 	let pi, ci, ki, ascii;
 	let output = "";
+	let asciiArr = [];
 
-	for(let i = 0; i < data.text.length; ++i) {
-		switch(type) {
-			case "ENCRYPT":
-				pi = data.text.charCodeAt(i);
-				ki = +KEY_MAP[i % KEY_MAP.length][+data.key - 1] % 256;
-				ascii = (pi + ki) % 256;
-			break;
-			case "DECRYPT":
-				ci = data.text.charCodeAt(i);
-				ki = +KEY_MAP[i % KEY_MAP.length][+data.key - 1] % 256;
-				ascii = (ci < ki ? (ci + 256 - ki) : (ci - ki)) % 256;
-			break;
+	if(type === "ENCRYPT") {
+		for(let i = 0; i < data.text.length; ++i) {
+			pi = data.text.charCodeAt(i);
+			ki = +KEY_MAP[i % KEY_MAP.length][+data.key - 1] % 256;
+			ascii = (pi + ki) % 256;
+
+			output += ascii.toString(16).padStart(2, "0");
+		}
+	} else {
+		for(let i = 0; i < data.text.length; i += 2) {
+			asciiArr.push(String.fromCharCode(parseInt(data.text.substr(i, 2), 16)));
 		}
 
-		output += String.fromCharCode(ascii);
+		for(let i = 0; i < asciiArr.length; ++i) {
+			ci = asciiArr[i].charCodeAt(0);
+			ki = +KEY_MAP[i % KEY_MAP.length][+data.key - 1] % 256;
+			ascii = (ci < ki ? (ci + 256 - ki) : (ci - ki)) % 256;
+
+			output += String.fromCharCode(ascii);
+		}
 	}
 
 	toggleOutput(output, OUTPUT_WRAPPER);
