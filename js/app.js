@@ -1,7 +1,6 @@
 "use strict";
 
 const $ = document.querySelector.bind(document);
-
 const MAX_ITERATION = 200;
 const X0 = new Decimal("0.880000000000000");
 
@@ -20,14 +19,11 @@ let generateKeyMap = (xi, fx, f1x, keyMap = []) => {
 		let keyRow = [];
 		let indexOfDot = _xi.toString().indexOf(".");
 		let xiFixed15 = _xi.toFixed(15);
-
 		let item = xiFixed15.substring(indexOfDot + 1, xiFixed15.length).split("");
 
 		for(let i = 0; i < 15; i += 3) {
 			let keyStr = "";
-			
 			for(let j = 0; j < 3; ++j) keyStr += item[i + j];
-
 			keyRow.push(keyStr);
 		}
 
@@ -64,7 +60,6 @@ let crypto = (type, data) => {
 				pi = data.text.charCodeAt(i);
 				ki = +KEY_MAP[i % KEY_MAP.length][+data.key - 1] % 256;
 				ascii = (pi + ki) % 256;
-
 				output += ascii.toString(16).padStart(2, "0");
 			}
 		break;
@@ -79,7 +74,6 @@ let crypto = (type, data) => {
 				ci = asciiArr[i].charCodeAt(0);
 				ki = +KEY_MAP[i % KEY_MAP.length][+data.key - 1] % 256;
 				ascii = (ci < ki ? (ci + 256 - ki) : (ci - ki)) % 256;
-
 				output += String.fromCharCode(ascii);
 			}
 		break;
